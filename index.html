@@ -9,13 +9,22 @@
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+1y8D4gOdEJ5FjL/3Kph1o+fb6MZlI44TyvMZ/0Es="
     crossorigin=""
   />
 
   <style>
-    body, html { margin: 0; height: 100%; }
-    #map { height: 100%; width: 100%; }
-    .popup-content { font-size: 14px; }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    .popup-content {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -24,44 +33,55 @@
   <!-- Leaflet JS -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j6V6D6sVwYq06z5Jw4MjfJdPZ9Qo3jHs4Jnx4r0="
     crossorigin=""
   ></script>
 
   <script>
+    // -------------------------------
     // 1️⃣ Initialize map
-    const map = L.map('map').setView([20, 0], 2);
+    // -------------------------------
+    const map = L.map('map', {
+      worldCopyJump: false // prevent horizontal wrap
+    }).setView([10, 80], 4); // focus on Bay of Bengal region
 
+    // Optional: restrict map bounds
+    const southWest = L.latLng(-60, 30);
+    const northEast = L.latLng(60, 160);
+    const bounds = L.latLngBounds(southWest, northEast);
+    map.setMaxBounds(bounds);
+    map.on('drag', () => map.panInsideBounds(bounds, { animate: false }));
+
+    // -------------------------------
     // 2️⃣ Add OpenStreetMap tiles
+    // -------------------------------
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '&copy; OpenStreetMap contributors',
+      noWrap: true // prevents repeating tiles
     }).addTo(map);
 
-    // 3️⃣ Fetch whale population data from FastAPI
+    // -------------------------------
+    // 3️⃣ Fetch whale population data
+    // -------------------------------
     const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
 
     fetch(apiUrl)
       .then(response => response.json())
-      .then(data => {
-        console.log('Whale data:', data);
-
-        // Example: show simple markers (static for now)
-        const testWhales = [
-          { species: 'Killer Whale', population: 5, latitude: 10, longitude: 80, region: 'Bay of Bengal', last_updated: '2026-01-04' },
-          { species: 'Humpback Whale', population: 12, latitude: -20, longitude: 150, region: 'Pacific Ocean', last_updated: '2026-01-04' }
-        ];
-
-        testWhales.forEach(w => {
-          const marker = L.marker([w.latitude, w.longitude]).addTo(map);
-          marker.bindPopup(`
-            <div class="popup-content">
-              <strong>Species:</strong> ${w.species} <br>
-              <strong>Population:</strong> ${w.population} <br>
-              <strong>Region:</strong> ${w.region} <br>
-              <strong>Last Updated:</strong> ${w.last_updated}
-            </div>
-          `);
+      .then(json => {
+        const whales = json.data || [];
+        whales.forEach(w => {
+          if (w.latitude && w.longitude) {
+            const marker = L.marker([w.latitude, w.longitude]).addTo(map);
+            marker.bindPopup(`
+              <div class="popup-content">
+                <strong>Species:</strong> ${w.species} <br>
+                <strong>Population:</strong> ${w.population} <br>
+                <strong>Region:</strong> ${w.region} <br>
+                <strong>Last Updated:</strong> ${w.last_updated}
+              </div>
+            `);
+          }
         });
-
       })
       .catch(err => {
         console.error('Failed to load whale data:', err);
