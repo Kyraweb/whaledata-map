@@ -1,67 +1,35 @@
-/* General layout */
 body, html {
   margin: 0;
-  padding: 0;
   height: 100%;
+  display: flex;
   font-family: Arial, sans-serif;
 }
 
-#container {
-  display: flex;
-  height: 100%;
-}
-
-/* Sidebar */
 #sidebar {
-  width: 320px;
-  min-width: 250px;
-  max-width: 400px;
-  background: #f8f9fa;
+  width: 300px;
   padding: 15px;
+  background: #f8f8f8;
   overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
-#sidebar h2 {
-  margin-top: 0;
+#map {
+  flex: 1;
 }
 
-#filters {
-  margin-bottom: 15px;
-}
-
-#filters label {
+label {
   display: block;
   margin-top: 10px;
   font-weight: bold;
 }
 
-#filters select {
+select {
   width: 100%;
   padding: 5px;
-  margin-top: 3px;
+  margin-bottom: 10px;
 }
 
-#whale-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.whale-item {
-  padding: 10px;
-  margin-bottom: 8px;
-  background: #ffffff;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.whale-item:hover {
-  background: #e9ecef;
-}
-
-/* Map */
-#map {
-  flex-grow: 1;
+.whale-entry {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
 }
