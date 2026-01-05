@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whale Population Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.5/dist/leaflet.css"
+    integrity="sha256-sA+oN+QnF2TAL2D+6C3CEbNLcFPkYK0o04Xv++3o0k0="
+    crossorigin=""
+  />
+  
+  <style>
+    body, html { margin: 0; height: 100%; }
+    #map { height: 100%; width: 100%; }
+    .popup-content { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.5/dist/leaflet.js"
+    integrity="sha256-o9N1j5YYT8m+3z9Q9Fpq0cKFVxERBL9xNY5i6L4wQBk="
+    crossorigin=""
+  ></script>
+
+  <script>
+    // 1️⃣ Initialize map
+    const map = L.map('map').setView([20, 0], 2); // center at equator, zoom 2
+
+    // 2️⃣ Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3️⃣ Fetch whale population data from FastAPI
+    const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population'; // replace with your API
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(json => {
+        const whales = json.data;
+        whales.forEach(w => {
+          if (w.latitude && w.longitude) {
+            const marker = L.marker([w.latitude, w.longitude]).addTo(map);
+            marker.bindPopup(`
+              <div class="popup-content">
+                <strong>Species:</strong> ${w.species} <br>
+                <strong>Population:</strong> ${w.population} <br>
+                <strong>Region:</strong> ${w.region} <br>
+                <strong>Last Updated:</strong> ${w.last_updated}
+              </div>
+            `);
+          }
+        });
+      })
+      .catch(err => {
+        console.error('Failed to fetch whale data:', err);
+        alert('Could not load whale data. Check API connection.');
+      });
+  </script>
+</body>
+</html>
