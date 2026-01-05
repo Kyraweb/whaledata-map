@@ -1,116 +1,106 @@
-// -----------------------------
-// main.js
-// -----------------------------
+mapboxgl.accessToken = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
-// 1️⃣ Initialize the map (centered at equator)
-const map = L.map('map', {
-  worldCopyJump: false // disables horizontal repetition
-}).setView([0, 0], 2);
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/streets-v12',
+  center: [0, 20],
+  zoom: 2
+});
 
-// 2️⃣ Add OpenStreetMap tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// 3️⃣ Global variables
 let allWhales = [];
-let markers = [];
+const speciesFilter = document.getElementById('species-filter');
+const regionFilter = document.getElementById('region-filter');
+const statsDiv = document.getElementById('stats');
 
-// 4️⃣ Fetch whale data from API
+// Fetch whale data from API
 async function fetchWhales() {
   try {
     const res = await fetch('http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population');
-    const json = await res.json();
-    if (json.error) {
-      console.error('API Error:', json.error);
-      return;
-    }
+    const data = await res.json();
+    allWhales = data.data;
 
-    allWhales = json.data;
     populateFilters(allWhales);
-    renderMarkers(allWhales);
+    renderMap(allWhales);
+    updateStats(allWhales);
   } catch (err) {
     console.error('Failed to fetch whale data:', err);
+    alert('Could not load whale data.');
   }
 }
 
-// 5️⃣ Populate sidebar dropdowns dynamically
+// Populate dropdown filters
 function populateFilters(data) {
   const speciesSet = new Set();
   const regionSet = new Set();
 
   data.forEach(w => {
-    if (w.scientific_name) speciesSet.add(w.scientific_name);
+    if (w.species) speciesSet.add(w.species);
     if (w.region) regionSet.add(w.region);
   });
 
-  const speciesSelect = document.getElementById('speciesFilter');
-  const regionSelect = document.getElementById('regionFilter');
-
-  // Clear old options
-  speciesSelect.innerHTML = `<option value="">All Species</option>`;
-  regionSelect.innerHTML = `<option value="">All Regions</option>`;
-
-  speciesSet.forEach(s => {
+  speciesSet.forEach(spec => {
     const option = document.createElement('option');
-    option.value = s;
-    option.textContent = s;
-    speciesSelect.appendChild(option);
+    option.value = spec;
+    option.textContent = spec;
+    speciesFilter.appendChild(option);
   });
 
-  regionSet.forEach(r => {
+  regionSet.forEach(region => {
     const option = document.createElement('option');
-    option.value = r;
-    option.textContent = r;
-    regionSelect.appendChild(option);
+    option.value = region;
+    option.textContent = region;
+    regionFilter.appendChild(option);
   });
 }
 
-// 6️⃣ Render markers on map
-function renderMarkers(data) {
-  // Clear existing markers
-  markers.forEach(m => map.removeLayer(m));
+// Render markers on map
+let markers = [];
+
+function renderMap(data) {
+  // Remove previous markers
+  markers.forEach(m => m.remove());
   markers = [];
 
   data.forEach(w => {
-    if (w.latitude == null || w.longitude == null) return;
-
-    const marker = L.marker([w.latitude, w.longitude]).addTo(map);
-
-    const popupContent = `
-      <div class="popup-content">
+    if (w.latitude && w.longitude) {
+      const popupHTML = `
         ${w.common_name ? `<strong>Common Name:</strong> ${w.common_name}<br>` : ''}
-        ${w.scientific_name ? `<strong>Scientific Name:</strong> ${w.scientific_name}<br>` : ''}
+        <strong>Scientific Name:</strong> ${w.species}<br>
         <strong>Population:</strong> ${w.population}<br>
         <strong>Region:</strong> ${w.region}<br>
         <strong>Last Updated:</strong> ${w.last_updated}
-      </div>
-    `;
-    marker.bindPopup(popupContent);
-    markers.push(marker);
+      `;
+      const marker = new mapboxgl.Marker()
+        .setLngLat([w.longitude, w.latitude])
+        .setPopup(new mapboxgl.Popup().setHTML(popupHTML))
+        .addTo(map);
+
+      markers.push(marker);
+    }
   });
 }
 
-// 7️⃣ Apply filters
+// Update stats
+function updateStats(data) {
+  statsDiv.innerHTML = `<p>Total whales: ${data.length}</p>`;
+}
+
+// Filter event listeners
 function applyFilters() {
-  const species = document.getElementById('speciesFilter').value;
-  const region = document.getElementById('regionFilter').value;
+  const speciesVal = speciesFilter.value;
+  const regionVal = regionFilter.value;
 
   const filtered = allWhales.filter(w => {
-    return (!species || w.scientific_name === species) &&
-           (!region || w.region === region);
+    return (speciesVal === '' || w.species === speciesVal) &&
+           (regionVal === '' || w.region === regionVal);
   });
 
-  renderMarkers(filtered);
+  renderMap(filtered);
+  updateStats(filtered);
 }
 
-// 8️⃣ Event listeners for filters
-document.addEventListener('DOMContentLoaded', () => {
-  fetchWhales();
+speciesFilter.addEventListener('change', applyFilters);
+regionFilter.addEventListener('change', applyFilters);
 
-  const speciesSelect = document.getElementById('speciesFilter');
-  const regionSelect = document.getElementById('regionFilter');
-
-  speciesSelect.addEventListener('change', applyFilters);
-  regionSelect.addEventListener('change', applyFilters);
-});
+// Initial fetch
+fetchWhales();
