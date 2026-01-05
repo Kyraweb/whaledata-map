@@ -39,7 +39,16 @@
     // 3️⃣ Fetch whale population data from FastAPI
     const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population'; // replace with your API
 
-    fetch(apiUrl)
+    fetch('http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population')
+      .then(response => response.json())
+  .then(data => {
+      console.log(data); // check data in browser console
+      // render your map here
+  })
+      .catch(err => {
+      console.error('Failed to load whale data:', err);
+      alert('Could not load whale data. Check API connection.');
+  });
       .then(res => res.json())
       .then(json => {
         const whales = json.data;
