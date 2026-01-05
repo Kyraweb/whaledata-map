@@ -116,6 +116,20 @@ select option[value=""] {
   color: #9ca3af;
 }
 
+.field {
+  position: relative;
+}
+
+.field::after {
+  content: '▾';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+}
 
 #reset-btn {
   padding: 10px 12px;
