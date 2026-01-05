@@ -1,58 +1,54 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // -----------------------------
-  // Mapbox Setup
-  // -----------------------------
-  mapboxgl.accessToken = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
-  
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11',
-    center: [0, 20],
-    zoom: 1.5
-  });
+// map and sidebar
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11',
+  center: [0, 20],
+  zoom: 2
+});
 
-  // -----------------------------
-  // Fetch Whale Data
-  // -----------------------------
-  const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
-  const listEl = document.getElementById('whale-list');
+const sidebar = document.getElementById('whale-list');
 
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(json => {
-      const whales = json.data;
+// Fetch whale data
+fetch('http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population')
+  .then(res => res.json())
+  .then(json => {
+    const whales = json.data;
+    whales.forEach(w => {
+      // Add marker
+      if (w.latitude && w.longitude) {
+        const marker = new mapboxgl.Marker()
+          .setLngLat([w.longitude, w.latitude])
+          .addTo(map);
 
-      if (!listEl) return; // safety check
+        // Bind popup
+        marker.setPopup(new mapboxgl.Popup({ offset: 25 })
+          .setHTML(`
+            <div>
+              ${w.common_name ? `<strong>Common Name:</strong> ${w.common_name}<br>` : ''}
+              <strong>Scientific Name:</strong> ${w.species}<br>
+              <strong>Population:</strong> ${w.population}<br>
+              <strong>Region:</strong> ${w.region}<br>
+              <strong>Last Updated:</strong> ${w.last_updated}
+            </div>
+          `));
+      }
 
-      whales.forEach(w => {
+      // Add to sidebar
+      const li = document.createElement('li');
+      li.className = 'whale-item';
+      li.innerHTML = `
+        ${w.common_name ? `<strong>Common Name:</strong> ${w.common_name}<br>` : ''}
+        <strong>Scientific Name:</strong> ${w.species}<br>
+        <strong>Population:</strong> ${w.population}<br>
+        <strong>Region:</strong> ${w.region}<br>
+        <strong>Last Updated:</strong> ${w.last_updated}
+      `;
+      li.addEventListener('click', () => {
         if (w.latitude && w.longitude) {
-          // Add marker on map
-          new mapboxgl.Marker({ color: '#1E90FF' })
-            .setLngLat([w.longitude, w.latitude])
-            .addTo(map);
-
-          // Create sidebar entry
-          const li = document.createElement('li');
-          li.classList.add('whale-item'); // add class for CSS styling
-          li.innerHTML = `
-            <strong>Common Name:</strong> ${w.common_name || '-'}<br>
-            <strong>Scientific Name:</strong> ${w.species}<br>
-            <strong>Population:</strong> ${w.population}<br>
-            <strong>Region:</strong> ${w.region}<br>
-            <strong>Last Updated:</strong> ${w.last_updated}
-          `;
-
-          // Fly to whale location on click
-          li.addEventListener('click', () => {
-            map.flyTo({ center: [w.longitude, w.latitude], zoom: 4 });
-          });
-
-          listEl.appendChild(li);
+          map.flyTo({ center: [w.longitude, w.latitude], zoom: 5 });
         }
       });
-    })
-    .catch(err => {
-      console.error('Failed to load whale data:', err);
-      alert('Could not load whale data. Check API connection.');
+      sidebar.appendChild(li);
     });
-});
+  })
+  .catch(err => console.error('Failed to fetch whale data:', err));
