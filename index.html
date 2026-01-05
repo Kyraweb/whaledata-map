@@ -35,22 +35,22 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.18.0/mapbox-gl.js"></script>
 
 <script>
-  // 1️⃣ Mapbox token
+  // 1️⃣ Set Mapbox token (must stay in quotes!)
   mapboxgl.accessToken = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
   // 2️⃣ Initialize map
   const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11',  // Modern light style
-    center: [0, 20],                             // Center at equator
+    style: 'mapbox://styles/mapbox/light-v11', // modern light style
+    center: [0, 20],                             // initial center
     zoom: 2,
-    maxBounds: [[-180, -90], [180, 90]]         // Limit panning to world bounds
+    maxBounds: [[-180, -90], [180, 90]]         // restrict to world bounds
   });
 
   // Add zoom and rotation controls
   map.addControl(new mapboxgl.NavigationControl());
 
-  // 3️⃣ Fetch whale population data
+  // 3️⃣ Fetch whale data from FastAPI backend
   const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
 
   fetch(apiUrl)
@@ -60,7 +60,7 @@
 
       whales.forEach(w => {
         if (w.latitude && w.longitude) {
-          // Create popup HTML
+          // Create popup content
           const popup = new mapboxgl.Popup({ offset: 25 })
             .setHTML(`
               <div>
@@ -71,7 +71,7 @@
               </div>
             `);
 
-          // Create marker
+          // Add marker
           new mapboxgl.Marker({ color: 'blue' })
             .setLngLat([w.longitude, w.latitude])
             .setPopup(popup)
@@ -87,6 +87,22 @@
       console.error('Failed to load whale data:', err);
       alert('Could not load whale data. Check API connection.');
     });
+
+  // 4️⃣ Optional: add slow globe rotation effect
+  let rotate = true;
+  map.on('load', () => {
+    function rotateGlobe() {
+      if (!rotate) return;
+      const center = map.getCenter();
+      map.setCenter([center.lng + 0.05, center.lat]);
+      requestAnimationFrame(rotateGlobe);
+    }
+    rotateGlobe();
+  });
+
+  // stop rotation on user interaction
+  map.on('dragstart', () => rotate = false);
+  map.on('zoomstart', () => rotate = false);
 </script>
 
 </body>
