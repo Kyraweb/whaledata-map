@@ -1,0 +1,18 @@
+/* Full-screen map */
+html, body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+/* Popup styling */
+.popup-content {
+  font-size: 14px;
+}
