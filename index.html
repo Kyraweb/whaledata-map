@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <title>Whale Population Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     crossorigin=""
   />
-  
+
   <style>
     body, html { margin: 0; height: 100%; }
     #map { height: 100%; width: 100%; }
@@ -29,7 +29,7 @@
 
   <script>
     // 1️⃣ Initialize map
-    const map = L.map('map').setView([20, 0], 2); // center at equator, zoom 2
+    const map = L.map('map').setView([20, 0], 2);
 
     // 2️⃣ Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -37,37 +37,34 @@
     }).addTo(map);
 
     // 3️⃣ Fetch whale population data from FastAPI
-    const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population'; // replace with your API
+    const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
 
-    fetch('http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population')
+    fetch(apiUrl)
       .then(response => response.json())
-  .then(data => {
-      console.log(data); // check data in browser console
-      // render your map here
-  })
-      .catch(err => {
-      console.error('Failed to load whale data:', err);
-      alert('Could not load whale data. Check API connection.');
-  });
-      .then(res => res.json())
-      .then(json => {
-        const whales = json.data;
-        whales.forEach(w => {
-          if (w.latitude && w.longitude) {
-            const marker = L.marker([w.latitude, w.longitude]).addTo(map);
-            marker.bindPopup(`
-              <div class="popup-content">
-                <strong>Species:</strong> ${w.species} <br>
-                <strong>Population:</strong> ${w.population} <br>
-                <strong>Region:</strong> ${w.region} <br>
-                <strong>Last Updated:</strong> ${w.last_updated}
-              </div>
-            `);
-          }
+      .then(data => {
+        console.log('Whale data:', data);
+
+        // Example: show simple markers (static for now)
+        const testWhales = [
+          { species: 'Killer Whale', population: 5, latitude: 10, longitude: 80, region: 'Bay of Bengal', last_updated: '2026-01-04' },
+          { species: 'Humpback Whale', population: 12, latitude: -20, longitude: 150, region: 'Pacific Ocean', last_updated: '2026-01-04' }
+        ];
+
+        testWhales.forEach(w => {
+          const marker = L.marker([w.latitude, w.longitude]).addTo(map);
+          marker.bindPopup(`
+            <div class="popup-content">
+              <strong>Species:</strong> ${w.species} <br>
+              <strong>Population:</strong> ${w.population} <br>
+              <strong>Region:</strong> ${w.region} <br>
+              <strong>Last Updated:</strong> ${w.last_updated}
+            </div>
+          `);
         });
+
       })
       .catch(err => {
-        console.error('Failed to fetch whale data:', err);
+        console.error('Failed to load whale data:', err);
         alert('Could not load whale data. Check API connection.');
       });
   </script>
