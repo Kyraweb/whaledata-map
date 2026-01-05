@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/light-v11',
-    center: [0, 20],  // center on equator
+    center: [0, 20],
     zoom: 1.5
   });
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(json => {
       const whales = json.data;
 
-      if (!listEl) return; // safety check if sidebar missing
+      if (!listEl) return; // safety check
 
       whales.forEach(w => {
         if (w.latitude && w.longitude) {
@@ -31,14 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .setLngLat([w.longitude, w.latitude])
             .addTo(map);
 
-          // Add entry in sidebar
+          // Create sidebar entry
           const li = document.createElement('li');
+          li.classList.add('whale-item'); // add class for CSS styling
           li.innerHTML = `
-            <strong>${w.common_name || w.species}</strong> 
-            (<em>${w.species}</em>)<br>
-            Population: ${w.population}<br>
-            Region: ${w.region}<br>
-            Last Updated: ${w.last_updated}
+            <strong>Common Name:</strong> ${w.common_name || '-'}<br>
+            <strong>Scientific Name:</strong> ${w.species}<br>
+            <strong>Population:</strong> ${w.population}<br>
+            <strong>Region:</strong> ${w.region}<br>
+            <strong>Last Updated:</strong> ${w.last_updated}
           `;
 
           // Fly to whale location on click
