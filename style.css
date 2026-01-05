@@ -1,18 +1,15 @@
-/* Full-screen map */
-html, body {
-  margin: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
+body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
+header { background: #0d3b66; color: #fff; padding: 10px; text-align: center; }
+#container { display: flex; height: calc(100% - 50px); }
+#map { flex: 1; }
+#sidebar {
+  width: 300px;
+  padding: 10px;
+  background: #f0f0f0;
+  overflow-y: auto;
 }
-
-#map {
-  height: 100%;
-  width: 100%;
-}
-
-/* Popup styling */
-.popup-content {
-  font-size: 14px;
-}
+#sidebar h2 { margin-top: 20px; }
+#sidebar label { display: block; margin-top: 10px; }
+#sidebar input, #sidebar select { width: 100%; margin-top: 5px; padding: 5px; }
+#sidebar button { margin-top: 10px; padding: 5px 10px; background: #0d3b66; color: white; border: none; cursor: pointer; }
+#sidebar button:hover { background: #144d8b; }
