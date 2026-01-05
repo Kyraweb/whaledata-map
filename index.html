@@ -4,49 +4,71 @@
   <meta charset="UTF-8">
   <title>Whale Population Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://api.mapbox.com/mapbox-gl-js/v2.18.0/mapbox-gl.js"></script>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v2.18.0/mapbox-gl.css" rel="stylesheet">
+
+  <!-- Mapbox GL JS CSS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.18.0/mapbox-gl.css" rel="stylesheet" />
+
   <style>
-    body, html { margin:0; height:100%; }
-    #map { width:100%; height:100%; }
-    .mapboxgl-popup-content { font-size: 14px; }
+    body, html {
+      margin: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .mapboxgl-popup-content {
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
 
+<!-- Mapbox GL JS -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.18.0/mapbox-gl.js"></script>
+
 <script>
-  // 1️⃣ Your Mapbox token
-  mapboxgl.accessToken = pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw;
+  // 1️⃣ Mapbox token
+  mapboxgl.accessToken = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
   // 2️⃣ Initialize map
   const map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/light-v11', // modern map style
-    center: [0, 20], // longitude, latitude
-    zoom: 2
+    style: 'mapbox://styles/mapbox/light-v11',  // Modern light style
+    center: [0, 20],                             // Center at equator
+    zoom: 2,
+    maxBounds: [[-180, -90], [180, 90]]         // Limit panning to world bounds
   });
 
-  // 3️⃣ Add zoom and rotation controls
+  // Add zoom and rotation controls
   map.addControl(new mapboxgl.NavigationControl());
 
-  // 4️⃣ Fetch whale population data
+  // 3️⃣ Fetch whale population data
   const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
 
   fetch(apiUrl)
     .then(res => res.json())
     .then(json => {
       const whales = json.data || [];
+
       whales.forEach(w => {
         if (w.latitude && w.longitude) {
-          // Create a popup
+          // Create popup HTML
           const popup = new mapboxgl.Popup({ offset: 25 })
             .setHTML(`
-              <strong>Species:</strong> ${w.species}<br>
-              <strong>Population:</strong> ${w.population}<br>
-              <strong>Region:</strong> ${w.region}<br>
-              <strong>Last Updated:</strong> ${w.last_updated}
+              <div>
+                <strong>Species:</strong> ${w.species}<br>
+                <strong>Population:</strong> ${w.population}<br>
+                <strong>Region:</strong> ${w.region}<br>
+                <strong>Last Updated:</strong> ${w.last_updated}
+              </div>
             `);
 
           // Create marker
@@ -56,6 +78,10 @@
             .addTo(map);
         }
       });
+
+      if (whales.length === 0) {
+        console.warn('No whale data found.');
+      }
     })
     .catch(err => {
       console.error('Failed to load whale data:', err);
