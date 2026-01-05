@@ -1,61 +1,67 @@
-/* Basic Reset */
-* {
-  box-sizing: border-box;
+/* General layout */
+body, html {
   margin: 0;
   padding: 0;
-}
-
-body, html {
   height: 100%;
   font-family: Arial, sans-serif;
 }
 
-/* Split layout: map on left, sidebar on right */
 #container {
   display: flex;
   height: 100%;
 }
 
-#map {
-  flex: 3; /* map takes 75% width */
-  height: 100%;
-}
-
+/* Sidebar */
 #sidebar {
-  flex: 1; /* sidebar takes 25% width */
-  height: 100%;
+  width: 320px;
+  min-width: 250px;
+  max-width: 400px;
+  background: #f8f9fa;
+  padding: 15px;
   overflow-y: auto;
-  background: #f8f8f8;
-  padding: 10px;
-  border-left: 1px solid #ccc;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
 #sidebar h2 {
-  margin-bottom: 10px;
-  font-size: 18px;
-  text-align: center;
-  color: #333;
+  margin-top: 0;
+}
+
+#filters {
+  margin-bottom: 15px;
+}
+
+#filters label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#filters select {
+  width: 100%;
+  padding: 5px;
+  margin-top: 3px;
 }
 
 #whale-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .whale-item {
   padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
+  margin-bottom: 8px;
+  background: #ffffff;
   border-radius: 5px;
-  background: #fff;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: background 0.2s;
 }
 
 .whale-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  background: #e9ecef;
 }
 
-.whale-item strong {
-  color: #1E90FF;
+/* Map */
+#map {
+  flex-grow: 1;
 }
