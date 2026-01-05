@@ -1,10 +1,11 @@
 // =============================
 // CONFIG
 // =============================
-const MAPBOX_TOKEN = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
+const MAPBOX_TOKEN =
+  'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
-// Your FastAPI endpoint:
-const API_URL = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
+const API_URL =
+  'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
 
 // =============================
 // HELPERS
@@ -12,6 +13,7 @@ const API_URL = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/populatio
 function isNum(x) {
   return typeof x === 'number' && !Number.isNaN(x);
 }
+
 function escapeHtml(str) {
   return String(str ?? '')
     .replaceAll('&', '&amp;')
@@ -21,11 +23,30 @@ function escapeHtml(str) {
     .replaceAll("'", '&#039;');
 }
 
+// ✅ Scientific name may come as scientific_name OR species (depending on your API)
+function getScientificName(w) {
+  const v = w?.scientific_name ?? w?.species ?? w?.scientificName ?? '';
+  const s = String(v).trim();
+  return s;
+}
+
+// ✅ Common name may come as common_name OR commonName OR vernacularName
+function getCommonName(w) {
+  const v = w?.common_name ?? w?.commonName ?? w?.vernacularName ?? '';
+  const s = String(v).trim();
+  return s.length ? s : null;
+}
+
+function getRegion(w) {
+  const v = w?.region ?? w?.country ?? '';
+  return String(v).trim() || 'Unknown';
+}
+
 // =============================
 // APP STATE
 // =============================
 let allWhales = [];
-let markers = []; // Mapbox Marker instances
+let markers = [];
 
 // =============================
 // DOM
@@ -44,7 +65,6 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const map = new mapboxgl.Map({
   container: 'map',
-  // Globe-like feel: use a Mapbox style; you can swap later to 'satellite-streets-v12', 'light-v11', etc.
   style: 'mapbox://styles/mapbox/streets-v12',
   center: [0, 20],
   zoom: 1.6,
@@ -59,45 +79,46 @@ async function loadData() {
   try {
     const res = await fetch(API_URL, { headers: { accept: 'application/json' } });
     if (!res.ok) throw new Error(`API failed: HTTP ${res.status}`);
-    const json = await res.json();
 
+    const json = await res.json();
     if (json.error) throw new Error(json.error);
     if (!Array.isArray(json.data)) throw new Error('API response missing `data` array');
 
     allWhales = json.data;
-    populateDropdownsFromData(allWhales);
 
-    // initial render
+    populateDropdownsFromData(allWhales);
     applyFiltersAndRender();
   } catch (err) {
     console.error('Failed to load whale data:', err);
     emptyState.classList.remove('hidden');
-    emptyState.textContent = 'Could not load whale data. Check API connection and console logs.';
+    emptyState.textContent =
+      'Could not load whale data. Check API connection and console logs.';
   }
 }
 
 function populateDropdownsFromData(data) {
-  // build sets from *existing DB data only*
   const speciesSet = new Set();
   const regionSet = new Set();
 
-  data.forEach(w => {
-    if (w?.species) speciesSet.add(w.species);
-    if (w?.region) regionSet.add(w.region);
+  data.forEach((w) => {
+    const sci = getScientificName(w);
+    const reg = getRegion(w);
+    if (sci) speciesSet.add(sci);
+    if (reg) regionSet.add(reg);
   });
 
-  // reset
+  // reset dropdowns
   speciesSel.innerHTML = '<option value="">All species</option>';
   regionSel.innerHTML = '<option value="">All regions</option>';
 
-  [...speciesSet].sort().forEach(s => {
+  [...speciesSet].sort().forEach((s) => {
     const opt = document.createElement('option');
     opt.value = s;
     opt.textContent = s;
     speciesSel.appendChild(opt);
   });
 
-  [...regionSet].sort().forEach(r => {
+  [...regionSet].sort().forEach((r) => {
     const opt = document.createElement('option');
     opt.value = r;
     opt.textContent = r;
@@ -112,26 +133,28 @@ function getFilteredData() {
   const selectedSpecies = speciesSel.value;
   const selectedRegion = regionSel.value;
 
-  return allWhales.filter(w => {
-    const okSpecies = !selectedSpecies || w.species === selectedSpecies;
-    const okRegion = !selectedRegion || w.region === selectedRegion;
+  return allWhales.filter((w) => {
+    const sci = getScientificName(w);
+    const reg = getRegion(w);
+
+    const okSpecies = !selectedSpecies || sci === selectedSpecies;
+    const okRegion = !selectedRegion || reg === selectedRegion;
     return okSpecies && okRegion;
   });
 }
 
 function clearMarkers() {
-  markers.forEach(m => m.remove());
+  markers.forEach((m) => m.remove());
   markers = [];
 }
 
 function renderMarkers(data) {
   clearMarkers();
 
-  // create bounds so we can fit results
   const bounds = new mapboxgl.LngLatBounds();
   let hasAny = false;
 
-  data.forEach(w => {
+  data.forEach((w) => {
     const lat = w?.latitude;
     const lon = w?.longitude;
 
@@ -140,16 +163,17 @@ function renderMarkers(data) {
     hasAny = true;
     bounds.extend([lon, lat]);
 
-    const commonName = (w.common_name && String(w.common_name).trim()) ? w.common_name : null;
-    const scientificName = w.species || '';
+    const commonName = getCommonName(w);
+    const scientificName = getScientificName(w);
+    const region = getRegion(w);
 
     const popupHtml = `
       <div>
         ${commonName ? `<div><strong>Common Name</strong>: ${escapeHtml(commonName)}</div>` : ''}
-        <div><strong>Scientific Name</strong>: ${escapeHtml(scientificName)}</div>
-        <div><strong>Population</strong>: ${escapeHtml(w.population)}</div>
-        <div><strong>Region</strong>: ${escapeHtml(w.region)}</div>
-        <div><strong>Last Updated</strong>: ${escapeHtml(w.last_updated)}</div>
+        <div><strong>Scientific Name</strong>: ${escapeHtml(scientificName || '-')}</div>
+        <div><strong>Population</strong>: ${escapeHtml(w.population ?? '-')}</div>
+        <div><strong>Region</strong>: ${escapeHtml(region)}</div>
+        <div><strong>Last Updated</strong>: ${escapeHtml(w.last_updated ?? '-')}</div>
       </div>
     `;
 
@@ -163,7 +187,6 @@ function renderMarkers(data) {
     markers.push(marker);
   });
 
-  // fit to bounds if we have results
   if (hasAny) {
     map.fitBounds(bounds, { padding: 60, maxZoom: 6, duration: 900 });
   }
@@ -171,7 +194,6 @@ function renderMarkers(data) {
 
 function renderSidebar(data) {
   whaleList.innerHTML = '';
-
   countEl.textContent = String(data.length);
 
   if (!data.length) {
@@ -181,8 +203,9 @@ function renderSidebar(data) {
   emptyState.classList.add('hidden');
 
   data.forEach((w, idx) => {
-    const commonName = (w.common_name && String(w.common_name).trim()) ? w.common_name : null;
-    const scientificName = w.species || '';
+    const commonName = getCommonName(w);
+    const scientificName = getScientificName(w);
+    const region = getRegion(w);
     const lat = w?.latitude;
     const lon = w?.longitude;
 
@@ -199,19 +222,19 @@ function renderSidebar(data) {
       ` : ''}
       <div class="row">
         <div class="key">Scientific Name</div>
-        <div class="val">${escapeHtml(scientificName)}</div>
+        <div class="val">${escapeHtml(scientificName || '-')}</div>
       </div>
       <div class="row">
         <div class="key">Population</div>
-        <div class="val">${escapeHtml(w.population)}</div>
+        <div class="val">${escapeHtml(w.population ?? '-')}</div>
       </div>
       <div class="row">
         <div class="key">Region</div>
-        <div class="val">${escapeHtml(w.region)}</div>
+        <div class="val">${escapeHtml(region)}</div>
       </div>
       <div class="row">
         <div class="key">Last Updated</div>
-        <div class="val">${escapeHtml(w.last_updated)}</div>
+        <div class="val">${escapeHtml(w.last_updated ?? '-')}</div>
       </div>
     `;
 
@@ -222,11 +245,10 @@ function renderSidebar(data) {
         center: [lon, lat],
         zoom: 5,
         speed: 0.9,
-        curve: 1.2
+        curve: 1.2,
       });
 
-      // open matching marker popup (best effort: match by coords)
-      const found = markers.find(m => {
+      const found = markers.find((m) => {
         const p = m.getLngLat();
         return p && Math.abs(p.lng - lon) < 1e-9 && Math.abs(p.lat - lat) < 1e-9;
       });
