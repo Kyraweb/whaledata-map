@@ -5,41 +5,22 @@
   <title>Whale Population Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Mapbox CSS -->
+  <!-- Mapbox GL CSS -->
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Whale Population Map</h1>
-  </header>
-
-  <div id="container">
-    <div id="map"></div>
-    <div id="sidebar">
-      <h2>Filters</h2>
-      <label>
-        Species:
-        <select id="speciesFilter">
-          <option value="">All</option>
-          <option value="Killer Whale">Killer Whale</option>
-          <option value="Humpback Whale">Humpback Whale</option>
-          <option value="Blue Whale">Blue Whale</option>
-        </select>
-      </label>
-      <label>
-        Region:
-        <input type="text" id="regionFilter" placeholder="Enter region">
-      </label>
-      <button id="applyFilters">Apply</button>
-
-      <h2>Whale Details</h2>
-      <div id="whaleDetails">Click a marker to see details</div>
-    </div>
+  <div id="map"></div>
+  <div id="sidebar">
+    <h2>Whale Info</h2>
+    <ul id="whale-list"></ul>
   </div>
 
-  <!-- Mapbox JS -->
+  <!-- Mapbox GL JS -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
+  <!-- Main JS -->
   <script src="main.js"></script>
 </body>
 </html>
