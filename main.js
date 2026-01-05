@@ -1,44 +1,66 @@
-// 1️⃣ Mapbox Access Token (keep in quotes)
+// Mapbox Access Token
 mapboxgl.accessToken = 'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
-// 2️⃣ Initialize Map
+// Initialize Map
 const map = new mapboxgl.Map({
-  container: 'map',
-  style: 'mapbox://styles/mapbox/light-v11', // light, clean theme
-  center: [0, 20], // world view
-  zoom: 2
+    container: 'map',
+    style: 'mapbox://styles/mapbox/light-v11',
+    center: [0, 20],
+    zoom: 1.5
 });
 
-// Add zoom and rotation controls
-map.addControl(new mapboxgl.NavigationControl());
+let markers = [];
 
-// 3️⃣ Fetch whale population data
-const apiUrl = 'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population'; // replace with your API
+// Fetch whale data
+async function fetchWhales(species='', region='') {
+    let url = `http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population?species=${encodeURIComponent(species)}&region=${encodeURIComponent(region)}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data.data || [];
+}
 
-fetch(apiUrl)
-  .then(response => response.json())
-  .then(json => {
-    const whales = json.data || [];
+// Render whales on map
+function renderWhales(whales) {
+    // Clear existing markers
+    markers.forEach(m => m.remove());
+    markers = [];
+
     whales.forEach(w => {
-      if (w.latitude && w.longitude) {
-        const popup = new mapboxgl.Popup({ offset: 25 })
-          .setHTML(`
-            <div class="popup-content">
-              <strong>Species:</strong> ${w.species}<br>
-              <strong>Population:</strong> ${w.population}<br>
-              <strong>Region:</strong> ${w.region}<br>
-              <strong>Last Updated:</strong> ${w.last_updated}
-            </div>
-          `);
+        if (w.latitude && w.longitude) {
+            const el = document.createElement('div');
+            el.className = 'marker';
+            el.style.background = '#FF5733';
+            el.style.width = '15px';
+            el.style.height = '15px';
+            el.style.borderRadius = '50%';
 
-        new mapboxgl.Marker({ color: 'blue' })
-          .setLngLat([w.longitude, w.latitude])
-          .setPopup(popup)
-          .addTo(map);
-      }
+            const marker = new mapboxgl.Marker(el)
+                .setLngLat([w.longitude, w.latitude])
+                .setPopup(new mapboxgl.Popup({ offset: 25 })
+                    .setHTML(`<strong>${w.species}</strong><br>Population: ${w.population}<br>Region: ${w.region}<br>Last Updated: ${w.last_updated}`))
+                .addTo(map);
+
+            el.addEventListener('click', () => {
+                document.getElementById('whaleDetails').innerHTML = `
+                    <strong>${w.species}</strong><br>
+                    Population: ${w.population}<br>
+                    Region: ${w.region}<br>
+                    Last Updated: ${w.last_updated}
+                `;
+            });
+
+            markers.push(marker);
+        }
     });
-  })
-  .catch(err => {
-    console.error('Failed to load whale data:', err);
-    alert('Could not load whale data. Check API connection.');
-  });
+}
+
+// Apply filters
+document.getElementById('applyFilters').addEventListener('click', async () => {
+    const species = document.getElementById('speciesFilter').value;
+    const region = document.getElementById('regionFilter').value;
+    const whales = await fetchWhales(species, region);
+    renderWhales(whales);
+});
+
+// Initial load
+fetchWhales().then(renderWhales);
