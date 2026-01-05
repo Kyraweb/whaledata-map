@@ -5,31 +5,35 @@ body, html {
   font-family: Arial, sans-serif;
 }
 
-#sidebar {
-  width: 300px;
-  padding: 15px;
-  background: #f8f8f8;
-  overflow-y: auto;
-}
-
 #map {
   flex: 1;
+  height: 100vh;
 }
 
-label {
-  display: block;
-  margin-top: 10px;
+#sidebar {
+  width: 300px;
+  background: #f8f9fa;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+#sidebar h2 {
+  margin-top: 0;
+}
+
+#sidebar label {
   font-weight: bold;
+  margin-top: 10px;
+  display: block;
 }
 
-select {
+#sidebar select {
   width: 100%;
+  margin-bottom: 15px;
   padding: 5px;
-  margin-bottom: 10px;
 }
 
-.whale-entry {
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 5px;
-  padding-bottom: 5px;
+.popup-content {
+  font-size: 14px;
 }
