@@ -16,51 +16,46 @@
       <div class="sidebar-header">
         <div class="brand">
           <div class="logo" aria-hidden="true">🐋</div>
-          <div>
+          <div class="brand-text">
             <div class="brand-title">whaledata.org</div>
             <div class="brand-subtitle">Population and sightings</div>
+
+            <!-- New subtle note (no footer) -->
+            <div class="brand-note">
+              © Kyra Web Studio (<a href="https://kyraweb.ca" target="_blank" rel="noopener">kyraweb.ca</a>) — hobby project, not an official data source.
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Everything in here scrolls -->
-      <div class="sidebar-scroll">
-        <div class="filters">
-          <div class="field">
-            <label for="species-filter">Species</label>
-            <select id="species-filter">
-              <option value="">All species</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="region-filter">Region</label>
-            <select id="region-filter">
-              <option value="">All regions</option>
-            </select>
-          </div>
-
-          <button id="reset-btn" type="button">Reset</button>
+      <div class="filters">
+        <div class="field">
+          <label for="species-filter">Species</label>
+          <select id="species-filter">
+            <option value="">All species</option>
+          </select>
         </div>
 
-        <div class="stats">
-          <div><strong>Results:</strong> <span id="result-count">0</span></div>
-          <div class="hint">Tip: click a row to fly to it</div>
+        <div class="field">
+          <label for="region-filter">Region</label>
+          <select id="region-filter">
+            <option value="">All regions</option>
+          </select>
         </div>
 
-        <div id="empty-state" class="empty-state hidden">
-          No whale data found for the selected filters.
-        </div>
-
-        <ul id="whale-list" class="whale-list"></ul>
+        <button id="reset-btn" type="button">Reset</button>
       </div>
 
-      <!-- Footer pinned at bottom (non-scrolling) -->
-      <div class="sidebar-footer">
-        <div class="footer-text">
-          Site by <strong>Kyra Web Studio</strong>. Hobby project, not to be used as official data source.
-        </div>
+      <div class="stats">
+        <div><strong>Results:</strong> <span id="result-count">0</span></div>
+        <div class="hint">Tip: click a row to fly to it</div>
       </div>
+
+      <div id="empty-state" class="empty-state hidden">
+        No whale data found for the selected filters.
+      </div>
+
+      <ul id="whale-list" class="whale-list"></ul>
     </aside>
 
     <main id="map-wrap">
