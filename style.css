@@ -39,17 +39,16 @@ html, body {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  overflow: hidden; /* IMPORTANT: sidebar itself does not scroll */
+  overflow: hidden; /* key: sidebar itself doesn't scroll */
 }
 
-/* Header stays at top */
 .sidebar-header {
   margin-bottom: 12px;
 }
 
 .brand {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -62,6 +61,10 @@ html, body {
   background: rgba(59, 130, 246, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 18px;
+}
+
+.brand-text {
+  min-width: 0;
 }
 
 .brand-title {
@@ -77,44 +80,23 @@ html, body {
   margin-top: 2px;
 }
 
-/* Scroll area in the middle */
-.sidebar-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: 6px; /* gives scrollbar breathing room */
-}
-
-/* Footer pinned at bottom */
-.sidebar-footer {
-  flex-shrink: 0;
-  padding-top: 12px;
-  margin-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-footer .footer-text {
+/* New subtle note under subtitle */
+.brand-note {
+  margin-top: 6px;
   font-size: 11px;
-  line-height: 1.4;
-  color: #94a3b8; /* muted slate */
+  line-height: 1.35;
+  color: rgba(203, 213, 225, 0.85);
 }
 
-.sidebar-footer strong {
-  color: #bfdbfe; /* soft brand blue */
-  font-weight: 600;
+.brand-note a {
+  color: rgba(147, 197, 253, 0.95);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(147, 197, 253, 0.55);
 }
 
-/* Optional scrollbar polish for the scroll area */
-.sidebar-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-}
-
-.sidebar-scroll::-webkit-scrollbar-track {
-  background: transparent;
+.brand-note a:hover {
+  color: #ffffff;
+  border-bottom-color: rgba(255, 255, 255, 0.8);
 }
 
 /* =========================================
@@ -218,15 +200,22 @@ html, body {
 }
 
 /* =========================================
-   Whale List (Sidebar results)
+   Whale List (Scrollable)
    ========================================= */
+
+/* This is the key to keeping list scrollable inside a flex sidebar */
+#whale-list {
+  flex: 1;
+  min-height: 0;         /* critical: allows scrolling in flex children */
+  overflow-y: auto;
+  padding-right: 6px;    /* space so scrollbar doesn't hug text */
+}
 
 .whale-list {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-bottom: 4px; /* little breathing room */
 }
 
 .whale-list li {
@@ -235,7 +224,7 @@ html, body {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  transition: transform 0.08s ease, background 0.12s ease, border-color 0.12s ease;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
 }
 
 .whale-list li:hover {
@@ -247,17 +236,18 @@ html, body {
   transform: translateY(1px);
 }
 
-.whale-list .title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 4px;
+/* Scrollbar styling for list */
+#whale-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.whale-list .meta {
-  font-size: 12px;
-  color: #c7d2fe;
-  line-height: 1.35;
+#whale-list::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+#whale-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* =========================================
