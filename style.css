@@ -46,12 +46,14 @@ html, body {
   margin-bottom: 12px;
 }
 
+/* Brand container */
 .brand {
   display: flex;
   align-items: flex-start;
   gap: 10px;
 }
 
+/* Logo */
 .logo {
   width: 38px;
   height: 38px;
@@ -61,12 +63,14 @@ html, body {
   background: rgba(59, 130, 246, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .brand-text {
   min-width: 0;
 }
 
+/* Title + subtitle */
 .brand-title {
   font-size: 18px;
   font-weight: 700;
@@ -80,23 +84,32 @@ html, body {
   margin-top: 2px;
 }
 
-/* New subtle note under subtitle */
+/* Separator */
+.brand-separator {
+  margin: 8px 0 6px;
+  border: none;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Attribution note */
 .brand-note {
-  margin-top: 6px;
   font-size: 11px;
   line-height: 1.35;
   color: rgba(203, 213, 225, 0.85);
 }
 
+/* Link: inherit color, underline only */
 .brand-note a {
-  color: rgba(147, 197, 253, 0.95);
-  text-decoration: none;
-  border-bottom: 1px dotted rgba(147, 197, 253, 0.55);
+  color: inherit;              /* NO new blue */
+  text-decoration: underline;  /* simple + clear */
 }
 
-.brand-note a:hover {
-  color: #ffffff;
-  border-bottom-color: rgba(255, 255, 255, 0.8);
+/* Hover / focus stays subtle */
+.brand-note a:hover,
+.brand-note a:focus {
+  text-decoration: underline;
+  color: inherit;
 }
 
 /* =========================================
