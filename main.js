@@ -2,7 +2,7 @@
 // CONFIG
 // =============================
 const MAPBOX_TOKEN =
-  'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
+  'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWsyMWxuOWcwYnpnM2pwbjA1ZHk3Y3VrIn0.DClObJNmvE3cXpa24y48cw';
 
 const API_URL =
   'https://api.whaledata.org/population';
