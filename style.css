@@ -341,6 +341,56 @@ html, body {
   border-radius: 50%;
 }
 
+/* Sidebar rows: label/value layout */
+.row-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kv {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  color: #c7d2fe;
+}
+
+.kv .k {
+  color: #93c5fd;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.kv .v {
+  color: #ffffff;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* Popup title + lines */
+.popup-wrap .popup-line {
+  font-size: 13px;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+/* Scientific name: keep ONE line on desktop */
+.popup-scientific {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+@media (min-width: 769px) {
+  .popup-scientific {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+  }
+}
+
 /* =========================================
    Responsive (Mobile)
    ========================================= */
