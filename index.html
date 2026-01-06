@@ -17,20 +17,83 @@
   <div id="app">
     <aside id="sidebar">
       <div class="sidebar-header">
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whale Data Map</title>
+
+  <!-- Mapbox CSS (must load before map renders) -->
+  <link
+    href="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.css"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <div class="sidebar-header">
         <div class="brand">
           <div class="logo" aria-hidden="true">🐋</div>
           <div class="brand-text">
             <div class="brand-title">whaledata.org</div>
             <div class="brand-subtitle">Population and sightings</div>
-
+<hr>
             <!-- New subtle attribution (always visible) -->
             <div class="brand-note">
-              © Kyra Web Studio
-              (<a href="https://kyraweb.ca" target="_blank" rel="noopener">kyraweb.ca</a>)
+              © <a href="https://kyraweb.ca" target="_blank" rel="noopener">Kyra Web Studio</a>
               — hobby project, not an official data source.
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="filters">
+        <div class="field">
+          <label for="species-filter">Species</label>
+          <select id="species-filter">
+            <option value="">All species</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="region-filter">Region</label>
+          <select id="region-filter">
+            <option value="">All regions</option>
+          </select>
+        </div>
+
+        <button id="reset-btn" type="button">Reset</button>
+      </div>
+
+      <div class="stats">
+        <div><strong>Results:</strong> <span id="result-count">0</span></div>
+        <div class="hint">Tip: click a row to fly to it</div>
+      </div>
+
+      <div id="empty-state" class="empty-state hidden">
+        No whale data found for the selected filters.
+      </div>
+
+      <ul id="whale-list" class="whale-list"></ul>
+    </aside>
+
+    <main id="map-wrap">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <!-- Mapbox JS (must load before main.js uses mapboxgl) -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.17.0/mapbox-gl.js"></script>
+
+  <!-- Your JS -->
+  <script src="main.js"></script>
+</body>
+</html>
+
       </div>
 
       <div class="filters">
