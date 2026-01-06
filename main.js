@@ -280,12 +280,15 @@ async function loadData() {
     const res = await fetch(API_URL, { method: "GET" });
     if (!res.ok) throw new Error(`API error: ${res.status}`);
 
-    const data = await res.json();
-    if (!Array.isArray(data)) {
-      throw new Error("API response is not an array.");
+    // Your API returns: { data: [...] }
+    const payload = await res.json();
+
+    if (!payload || !Array.isArray(payload.data)) {
+      console.error("Unexpected API response shape:", payload);
+      throw new Error("API response missing data[] array.");
     }
 
-    allRows = data.map(normalizeRow);
+    allRows = payload.data.map(normalizeRow);
 
     populateFilters(allRows);
     applyFiltersAndRender();
