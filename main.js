@@ -5,7 +5,7 @@ const MAPBOX_TOKEN =
   'pk.eyJ1Ijoia3lyYXdlYmluYyIsImEiOiJjbWswdWRjaDQwdmwwM2RxMzhqdXVwNmFoIn0.wJ5_grZwyYNMBJRzfcMptw';
 
 const API_URL =
-  'http://h00ws84ww08c4cw804go8444.142.171.41.4.sslip.io/population';
+  'https://api.whaledata.org/population';
 
 // =============================
 // HELPERS
